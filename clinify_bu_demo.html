@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinify.BU — Student Health Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #1D9E75;
+    --green-light: #E1F5EE;
+    --green-dark: #0F6E56;
+    --green-deeper: #085041;
+    --teal: #0891b2;
+    --cream: #FAFAF7;
+    --white: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    --border: #e5e7eb;
+    --border-light: #f3f4f6;
+    --accent: #D85A30;
+    --accent-light: #FAECE7;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* Lucide icon sizing helpers */
+  .icon-sm { width: 16px; height: 16px; }
+  .icon-md { width: 20px; height: 20px; }
+  .icon-lg { width: 28px; height: 28px; }
+  .icon-xl { width: 40px; height: 40px; }
+  svg[data-lucide] { display: inline-block; vertical-align: middle; stroke-width: 1.75; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(250,250,247,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem; color: var(--green-dark);
+    cursor: pointer;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+  .nav-links a {
+    font-size: 13px; color: var(--text-muted); text-decoration: none;
+    cursor: pointer; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--green); }
+  .nav-btn {
+    background: var(--green); color: white;
+    border: none; border-radius: var(--radius-sm);
+    padding: 8px 18px; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .nav-btn:hover { background: var(--green-dark); }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    border: none; transition: all 0.2s; text-decoration: none;
+  }
+  .btn-primary { background: var(--green); color: white; }
+  .btn-primary:hover { background: var(--green-dark); }
+  .btn-outline {
+    background: transparent; color: var(--green);
+    border: 1.5px solid var(--green);
+  }
+  .btn-outline:hover { background: var(--green-light); }
+  .btn-sm { padding: 8px 16px; font-size: 13px; }
+  .btn-white { background: white; color: var(--green-dark); }
+  .btn-white:hover { background: var(--green-light); }
+
+  /* CARD */
+  .card {
+    background: white; border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  /* BADGE */
+  .badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 20px; font-size: 11px; font-weight: 500;
+    background: var(--green-light); color: var(--green-dark);
+  }
+  .badge-accent { background: var(--accent-light); color: var(--accent); }
+
+  /* SECTION */
+  .section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-sm { padding: 2rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+  /* TAG */
+  .tag {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--green); margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  /* FORM */
+  .form-group { margin-bottom: 1.2rem; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-muted); }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 10px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: white;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--green);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  /* CHECKBOX GROUP */
+  .checkbox-group { display: flex; flex-direction: column; gap: 10px; }
+  .checkbox-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); cursor: pointer;
+    transition: all 0.2s; user-select: none;
+  }
+  .checkbox-item:hover { border-color: var(--green); background: var(--green-light); }
+  .checkbox-item.checked { border-color: var(--green); background: var(--green-light); }
+  .checkbox-item input { accent-color: var(--green); width: 16px; height: 16px; }
+  .checkbox-item svg { flex-shrink: 0; color: var(--text-muted); }
+
+  /* RADIO */
+  .radio-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .radio-card {
+    flex: 1; min-width: 140px; padding: 1rem;
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .radio-card:hover { border-color: var(--green); }
+  .radio-card.selected { border-color: var(--green); background: var(--green-light); }
+  .radio-card .icon { font-size: 1.8rem; margin-bottom: 6px; display: flex; justify-content: center; align-items: center; }
+  .radio-card .label { font-size: 13px; font-weight: 500; }
+  .radio-card .sublabel { font-size: 11px; color: var(--text-muted); }
+
+  /* SCALE */
+  .scale-group { display: flex; gap: 8px; }
+  .scale-btn {
+    width: 40px; height: 40px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: white;
+    cursor: pointer; font-size: 13px; font-weight: 500;
+    transition: all 0.2s;
+  }
+  .scale-btn:hover { border-color: var(--green); background: var(--green-light); }
+  .scale-btn.selected { border-color: var(--green); background: var(--green); color: white; }
+
+  /* RESULT BOX */
+  .result-box {
+    padding: 1.2rem; border-radius: var(--radius-sm);
+    border-left: 3px solid var(--green); background: var(--green-light);
+  }
+  .result-box.warning { border-color: #f59e0b; background: #fffbeb; }
+  .result-box.danger { border-color: var(--accent); background: var(--accent-light); }
+
+  /* TIMELINE */
+  .timeline { display: flex; gap: 0; }
+  .timeline-step {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    position: relative;
+  }
+  .timeline-step::after {
+    content: ''; position: absolute; top: 18px; left: 50%; width: 100%; height: 2px;
+    background: var(--border);
+  }
+  .timeline-step:last-child::after { display: none; }
+  .timeline-step.done::after { background: var(--green); }
+  .step-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2px solid var(--border); background: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    position: relative; z-index: 1;
+  }
+  .timeline-step.done .step-circle { border-color: var(--green); background: var(--green); color: white; }
+  .timeline-step.active .step-circle { border-color: var(--green); color: var(--green); }
+  .step-label { font-size: 11px; margin-top: 6px; text-align: center; color: var(--text-muted); }
+
+  /* ALERT */
+  .alert {
+    padding: 1rem 1.25rem; border-radius: var(--radius-sm);
+    background: var(--green-light); border: 1px solid #9FE1CB;
+    color: var(--green-deeper); font-size: 14px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .alert svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* PAGE HEADER */
+  .page-header {
+    background: white; border-bottom: 1px solid var(--border);
+    padding: 2rem 2rem 1.5rem;
+  }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem; margin-bottom: 4px;
+  }
+  .page-header p { color: var(--text-muted); font-size: 14px; }
+
+  /* AVATAR */
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--green-light); color: var(--green-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 14px;
+  }
+
+  /* STAT CARD */
+  .stat-card {
+    background: white; border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 1.2rem;
+  }
+  .stat-card .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  .stat-card .stat-value { font-size: 1.6rem; font-weight: 600; color: var(--text); }
+  .stat-card .stat-sub { font-size: 11px; color: var(--green); margin-top: 2px; }
+
+  /* SERVICE CARD */
+  .service-card {
+    background: white; border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 1.5rem;
+    cursor: pointer; transition: all 0.25s;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .service-card:hover {
+    border-color: var(--green); box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .service-icon {
+    width: 44px; height: 44px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* WELLNESS METER */
+  .meter-bar {
+    height: 8px; border-radius: 4px; background: var(--border);
+    margin: 6px 0;
+  }
+  .meter-fill {
+    height: 100%; border-radius: 4px; background: var(--green);
+    transition: width 0.6s ease;
+  }
+
+  /* CALENDAR GRID */
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    margin-top: 1rem;
+  }
+  .cal-cell {
+    aspect-ratio: 1; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; cursor: pointer; transition: all 0.2s;
+    background: white;
+  }
+  .cal-cell:hover { border-color: var(--green); background: var(--green-light); }
+  .cal-cell.selected { border-color: var(--green); background: var(--green); color: white; }
+  .cal-cell.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+  .cal-cell.today { font-weight: 600; border-color: var(--green); color: var(--green); }
+
+  /* HERO */
+  .hero {
+    min-height: 88vh; display: flex; align-items: center;
+    background: linear-gradient(135deg, #f0fdf7 0%, #e8f8f1 50%, #fff 100%);
+    padding: 4rem 2rem; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; right: -100px; top: -100px;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(29,158,117,0.08) 0%, transparent 70%);
+  }
+  .hero-content { max-width: 1100px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: 3.2rem; line-height: 1.15; margin-bottom: 1rem; }
+  .hero h1 em { font-style: italic; color: var(--green); }
+  .hero p { color: var(--text-muted); font-size: 1rem; max-width: 420px; margin-bottom: 1.8rem; }
+  .hero-actions { display: flex; gap: 1rem; }
+  .hero-visual {
+    background: white; border-radius: 20px;
+    border: 1px solid var(--border); padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--green-deeper); color: rgba(255,255,255,0.7);
+    padding: 3rem 2rem; margin-top: 4rem;
+  }
+  footer .footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem; }
+  footer h3 { font-family: 'DM Serif Display', serif; color: white; font-size: 1.1rem; margin-bottom: 1rem; }
+  footer a { color: rgba(255,255,255,0.6); text-decoration: none; display: block; margin-bottom: 8px; font-size: 13px; cursor: pointer; }
+  footer a:hover { color: white; }
+  .footer-bottom { max-width: 1100px; margin: 2rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+
+  /* DASHBOARD SIDEBAR */
+  .dashboard-layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 60px); }
+  .sidebar {
+    background: white; border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 1.5rem; font-size: 13px; cursor: pointer;
+    transition: all 0.2s; color: var(--text-muted); border-radius: 0;
+    border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { background: var(--green-light); color: var(--green); }
+  .sidebar-item.active { background: var(--green-light); color: var(--green); border-left-color: var(--green); font-weight: 500; }
+  .sidebar-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .sidebar-item:hover svg, .sidebar-item.active svg { color: var(--green); }
+  .main-content { background: var(--cream); padding: 2rem; overflow-y: auto; }
+
+  /* SUCCESS */
+  .success-screen {
+    text-align: center; padding: 3rem 2rem;
+    display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  }
+  .success-icon {
+    width: 70px; height: 70px; border-radius: 50%;
+    background: var(--green-light); display: flex; align-items: center; justify-content: center;
+  }
+
+  /* COACH CARD */
+  .tip-card {
+    background: white; border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 1.25rem;
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .tip-icon {
+    width: 44px; height: 44px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* TEST LIST */
+  .test-item {
+    background: white; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); padding: 1rem 1.25rem;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .test-item:hover { border-color: var(--green); }
+  .test-item.selected { border-color: var(--green); background: var(--green-light); }
+
+  /* ABOUT HERO */
+  .about-hero {
+    background: var(--green-deeper); color: white; padding: 4rem 2rem;
+    text-align: center;
+  }
+  .about-hero h1 { font-family: 'DM Serif Display', serif; font-size: 2.5rem; margin-bottom: 1rem; }
+  .about-hero p { color: rgba(255,255,255,0.75); max-width: 560px; margin: 0 auto; }
+
+  /* Step number circles for About */
+  .step-num {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--green-light); color: var(--green-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 1.3rem; font-weight: 700;
+    margin: 0 auto 10px;
+  }
+
+  /* MISC */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+  .text-center { text-align: center; }
+  .mt-1 { margin-top: 0.5rem; }
+  .mt-2 { margin-top: 1rem; }
+  .mt-3 { margin-top: 1.5rem; }
+  .mb-1 { margin-bottom: 0.5rem; }
+  .mb-2 { margin-bottom: 1rem; }
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .gap-1 { gap: 0.5rem; }
+  .gap-2 { gap: 1rem; }
+  .hidden { display: none !important; }
+  h2 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+  p { margin-bottom: 0; }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .hero-content { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 2.2rem; }
+    .dashboard-layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .footer-inner { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">Clinify<span>.BU</span></div>
+  <div class="nav-links">
+    <a onclick="showPage('home')">Home</a>
+    <a onclick="showPage('dashboard')">Services</a>
+    <a onclick="showPage('about')">About</a>
+    <button class="nav-btn" onclick="showPage('login')">Login</button>
+  </div>
+</nav>
+
+<!-- ===================== PAGE: HOME ===================== -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-content">
+      <div>
+        <span class="badge">Babcock University Health Platform</span>
+        <h1 style="margin-top:1rem">Your health,<br><em>simplified</em> and<br>always close.</h1>
+        <p>Clinify.BU connects Babcock University students to BUTH health services — symptom checks, mental wellness, consultations, and more. All in one place.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="showPage('login')">Get Started <i data-lucide="arrow-right" class="icon-sm"></i></button>
+          <button class="btn btn-outline" onclick="showPage('about')">Learn More</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.2rem">
+          <div class="avatar">AO</div>
+          <div>
+            <p style="font-weight:600;font-size:14px">Good morning, Adaeze</p>
+            <p style="font-size:12px;color:var(--text-muted)">Your wellness dashboard is ready</p>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem">
+          <div class="stat-card">
+            <p class="stat-label">Wellness Score</p>
+            <p class="stat-value" style="font-size:1.4rem;color:var(--green)">82%</p>
+            <p class="stat-sub">↑ Better than last month</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Next Visit</p>
+            <p class="stat-value" style="font-size:1rem;margin-top:4px">Apr 14, 2025</p>
+            <p class="stat-sub">BUTH Clinic</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)"><span>Sleep quality</span><span>Good</span></div>
+          <div class="meter-bar"><div class="meter-fill" style="width:75%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)"><span>Stress level</span><span>Moderate</span></div>
+          <div class="meter-bar"><div class="meter-fill" style="width:45%;background:#f59e0b"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)"><span>Physical activity</span><span>Low</span></div>
+          <div class="meter-bar"><div class="meter-fill" style="width:25%;background:var(--accent)"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="section">
+    <div class="text-center" style="margin-bottom:3rem">
+      <span class="tag">What we offer</span>
+      <h2 style="font-size:2rem">Everything your health needs,<br>right on campus</h2>
+    </div>
+    <div class="grid-3">
+      <div class="card" style="border-top:3px solid var(--green)">
+        <div style="margin-bottom:10px;color:var(--green)"><i data-lucide="stethoscope" class="icon-lg"></i></div>
+        <h3>Symptom Checker</h3>
+        <p style="color:var(--text-muted);font-size:13px">Describe how you feel. Get instant guidance on whether to rest, visit the clinic, or seek urgent care.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #8b5cf6">
+        <div style="margin-bottom:10px;color:#8b5cf6"><i data-lucide="brain" class="icon-lg"></i></div>
+        <h3>Mental Health Screening</h3>
+        <p style="color:var(--text-muted);font-size:13px">Short, confidential check-ins on your mood, stress, and sleep. Know how you're really doing.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #0891b2">
+        <div style="margin-bottom:10px;color:#0891b2"><i data-lucide="calendar" class="icon-lg"></i></div>
+        <h3>Book Consultation</h3>
+        <p style="color:var(--text-muted);font-size:13px">Schedule a physical or online appointment with BUTH doctors. No queues, no hassle.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #f59e0b">
+        <div style="margin-bottom:10px;color:#f59e0b"><i data-lucide="microscope" class="icon-lg"></i></div>
+        <h3>Lab Test Scheduling</h3>
+        <p style="color:var(--text-muted);font-size:13px">Book blood tests, malaria panels, and other diagnostics directly at the teaching hospital.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #10b981">
+        <div style="margin-bottom:10px;color:#10b981"><i data-lucide="salad" class="icon-lg"></i></div>
+        <h3>Lifestyle Coaching</h3>
+        <p style="color:var(--text-muted);font-size:13px">Evidence-based tips on nutrition, sleep, hydration, and exercise built for student life.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--accent)">
+        <div style="margin-bottom:10px;color:var(--accent)"><i data-lucide="bar-chart-2" class="icon-lg"></i></div>
+        <h3>Monthly Wellness Check-in</h3>
+        <p style="color:var(--text-muted);font-size:13px">Track your well-being over time. See patterns and get personalized health insights monthly.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Banner -->
+  <div style="background:var(--green-deeper);padding:3rem 2rem;text-align:center;color:white">
+    <h2 style="color:white;font-size:1.8rem;margin-bottom:0.8rem">Connected to BUTH.<br>Built for BU students.</h2>
+    <p style="color:rgba(255,255,255,0.7);margin-bottom:1.5rem">Join thousands of students who are taking charge of their health on campus.</p>
+    <button class="btn btn-white" onclick="showPage('login')">Login with BU Credentials <i data-lucide="arrow-right" class="icon-sm"></i></button>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <h3>Clinify.BU</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.6);max-width:280px">A student health platform connecting Babcock University students to quality care at BUTH.</p>
+      </div>
+      <div>
+        <h3>Services</h3>
+        <a onclick="showPage('dashboard')">Symptom Checker</a>
+        <a onclick="showPage('dashboard')">Mental Health</a>
+        <a onclick="showPage('dashboard')">Book Appointment</a>
+        <a onclick="showPage('dashboard')">Lab Tests</a>
+      </div>
+      <div>
+        <h3>Info</h3>
+        <a onclick="showPage('about')">About Clinify.BU</a>
+        <a onclick="showPage('about')">Contact BUTH</a>
+        <a onclick="showPage('about')">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Clinify.BU · Babcock University Teaching Hospital</span>
+      <span>Ile-Ife Road, Ilishan-Remo, Ogun State</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ===================== PAGE: LOGIN ===================== -->
+<div id="page-login" class="page">
+  <div style="min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:2rem;background:linear-gradient(135deg,#f0fdf7,#e8f8f1)">
+    <div style="width:100%;max-width:420px">
+      <div class="text-center" style="margin-bottom:2rem">
+        <div style="font-family:'DM Serif Display',serif;font-size:2rem;color:var(--green-dark)">Clinify<span style="color:var(--accent)">.BU</span></div>
+        <p style="color:var(--text-muted);margin-top:6px;font-size:14px">Sign in with your Babcock University credentials</p>
+      </div>
+      <div class="card" style="padding:2rem">
+        <div class="alert" style="margin-bottom:1.5rem">
+          <i data-lucide="lock" style="width:16px;height:16px;flex-shrink:0;margin-top:1px"></i>
+          <span style="font-size:13px">Use your BU student portal email and password</span>
+        </div>
+        <div class="form-group">
+          <label>Student Email</label>
+          <input type="email" placeholder="u2021xxxxx@babcock.edu.ng" id="login-email">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="••••••••" id="login-pass">
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:-0.5rem;margin-bottom:1rem">
+          <a style="font-size:12px;color:var(--green);cursor:pointer">Forgot password?</a>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()">Sign In to Clinify.BU</button>
+        <p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:1rem">Protected by Babcock University SSO</p>
+      </div>
+      <p style="text-align:center;margin-top:1rem;font-size:13px;color:var(--text-muted)">
+        New to Clinify? <a style="color:var(--green);cursor:pointer" onclick="showPage('about')">Learn more →</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: DASHBOARD ===================== -->
+<div id="page-dashboard" class="page">
+  <div class="dashboard-layout">
+    <div class="sidebar">
+      <div style="padding:0 1.5rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar">AO</div>
+          <div>
+            <p style="font-size:13px;font-weight:600">Adaeze Okonkwo</p>
+            <p style="font-size:11px;color:var(--text-muted)">U2021045321</p>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-item active" onclick="showPage('dashboard')"><i data-lucide="layout-dashboard"></i> Dashboard</div>
+      <div class="sidebar-item" onclick="showPage('symptoms')"><i data-lucide="stethoscope"></i> Symptom Checker</div>
+      <div class="sidebar-item" onclick="showPage('mental')"><i data-lucide="brain"></i> Mental Health</div>
+      <div class="sidebar-item" onclick="showPage('book')"><i data-lucide="calendar"></i> Book Consultation</div>
+      <div class="sidebar-item" onclick="showPage('tests')"><i data-lucide="microscope"></i> Schedule Tests</div>
+      <div class="sidebar-item" onclick="showPage('coaching')"><i data-lucide="salad"></i> Lifestyle Coaching</div>
+      <div class="sidebar-item" onclick="showPage('checkin')"><i data-lucide="bar-chart-2"></i> Monthly Check-in</div>
+      <div style="margin-top:auto;padding:1rem 1.5rem;border-top:1px solid var(--border);margin-top:2rem">
+        <div class="sidebar-item" style="padding-left:0" onclick="showPage('home')"><i data-lucide="log-out"></i> Sign Out</div>
+      </div>
+    </div>
+    <div class="main-content">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem">
+        <div>
+          <h2 style="display:flex;align-items:center;gap:8px">Good morning, Adaeze <i data-lucide="hand-metal" style="width:24px;height:24px;color:var(--green)"></i></h2>
+          <p style="color:var(--text-muted);font-size:14px">Here's your health overview for today, April 2025.</p>
+        </div>
+        <span class="badge">Semester 2 · 2024/25</span>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid-4" style="margin-bottom:2rem">
+        <div class="stat-card">
+          <p class="stat-label">Wellness Score</p>
+          <p class="stat-value" style="color:var(--green)">82%</p>
+          <p class="stat-sub">↑ 6% this month</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Appointments</p>
+          <p class="stat-value">2</p>
+          <p class="stat-sub">1 upcoming</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Last Check-in</p>
+          <p class="stat-value" style="font-size:1rem;margin-top:4px">Mar 2025</p>
+          <p class="stat-sub">Next due April</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Mental Health</p>
+          <p class="stat-value" style="font-size:1rem;color:#8b5cf6">Moderate</p>
+          <p class="stat-sub">Take screening →</p>
+        </div>
+      </div>
+
+      <!-- Services -->
+      <h3 style="margin-bottom:1rem">Quick Access</h3>
+      <div class="grid-3">
+        <div class="service-card" onclick="showPage('symptoms')">
+          <div class="service-icon" style="background:#e8f8f1;color:var(--green)"><i data-lucide="stethoscope" style="width:22px;height:22px"></i></div>
+          <div>
+            <h3 style="font-size:14px">Symptom Checker</h3>
+            <p style="font-size:12px;color:var(--text-muted)">Not feeling well? Check your symptoms</p>
+          </div>
+          <span style="color:var(--green);font-size:12px">Open →</span>
+        </div>
+        <div class="service-card" onclick="showPage('mental')">
+          <div class="service-icon" style="background:#f3f0ff;color:#8b5cf6"><i data-lucide="brain" style="width:22px;height:22px"></i></div>
+          <div>
+            <h3 style="font-size:14px">Mental Health Screening</h3>
+            <p style="font-size:12px;color:var(--text-muted)">Quick mood and stress check</p>
+          </div>
+          <span style="color:#8b5cf6;font-size:12px">Open →</span>
+        </div>
+        <div class="service-card" onclick="showPage('book')">
+          <div class="service-icon" style="background:#e0f2fe;color:#0891b2"><i data-lucide="calendar" style="width:22px;height:22px"></i></div>
+          <div>
+            <h3 style="font-size:14px">Book Consultation</h3>
+            <p style="font-size:12px;color:var(--text-muted)">Schedule with a BUTH doctor</p>
+          </div>
+          <span style="color:#0891b2;font-size:12px">Open →</span>
+        </div>
+        <div class="service-card" onclick="showPage('tests')">
+          <div class="service-icon" style="background:#fefce8;color:#f59e0b"><i data-lucide="microscope" style="width:22px;height:22px"></i></div>
+          <div>
+            <h3 style="font-size:14px">Schedule Lab Tests</h3>
+            <p style="font-size:12px;color:var(--text-muted)">Book diagnostics at BUTH</p>
+          </div>
+          <span style="color:#f59e0b;font-size:12px">Open →</span>
+        </div>
+        <div class="service-card" onclick="showPage('coaching')">
+          <div class="service-icon" style="background:#ecfdf5;color:#10b981"><i data-lucide="salad" style="width:22px;height:22px"></i></div>
+          <div>
+            <h3 style="font-size:14px">Lifestyle Coaching</h3>
+            <p style="font-size:12px;color:var(--text-muted)">Nutrition, sleep & exercise tips</p>
+          </div>
+          <span style="color:#10b981;font-size:12px">Open →</span>
+        </div>
+        <div class="service-card" onclick="showPage('checkin')">
+          <div class="service-icon" style="background:var(--accent-light);color:var(--accent)"><i data-lucide="bar-chart-2" style="width:22px;height:22px"></i></div>
+          <div>
+            <h3 style="font-size:14px">Monthly Check-in</h3>
+            <p style="font-size:12px;color:var(--text-muted)">Track your wellness over time</p>
+          </div>
+          <span style="color:var(--accent);font-size:12px">Due now →</span>
+        </div>
+      </div>
+
+      <!-- Upcoming appointment -->
+      <div style="margin-top:2rem">
+        <h3 style="margin-bottom:1rem">Upcoming Appointment</h3>
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+          <div style="display:flex;gap:1rem;align-items:center">
+            <div style="background:var(--green-light);border-radius:var(--radius-sm);padding:10px;text-align:center;min-width:50px">
+              <p style="font-size:11px;color:var(--green);font-weight:600">APR</p>
+              <p style="font-size:1.4rem;font-weight:700;color:var(--green-dark)">14</p>
+            </div>
+            <div>
+              <h3 style="font-size:14px">General Check-up · Dr. Abiodun</h3>
+              <p style="font-size:12px;color:var(--text-muted)">10:00 AM · BUTH Clinic, Room 3</p>
+              <span class="badge" style="margin-top:4px;font-size:10px">Confirmed</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm">Reschedule</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: SYMPTOMS ===================== -->
+<div id="page-symptoms" class="page">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn btn-outline btn-sm" onclick="showPage('dashboard')">← Back</button>
+      <div>
+        <h1>Symptom Checker</h1>
+        <p>Select what you're experiencing and get guidance</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div id="symptom-form">
+      <div class="grid-2" style="gap:2rem">
+        <div>
+          <h3 style="margin-bottom:1rem">Select your symptoms</h3>
+          <div class="checkbox-group" id="symptom-list">
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="fever"><i data-lucide="thermometer" style="width:16px;height:16px;color:var(--accent)"></i> Fever or high temperature</label>
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="headache"><i data-lucide="zap" style="width:16px;height:16px;color:#f59e0b"></i> Headache or migraine</label>
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="cough"><i data-lucide="wind" style="width:16px;height:16px;color:#0891b2"></i> Cough or sore throat</label>
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="fatigue"><i data-lucide="moon" style="width:16px;height:16px;color:#6d28d9"></i> Unusual tiredness / fatigue</label>
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="stomach"><i data-lucide="circle-alert" style="width:16px;height:16px;color:#f59e0b"></i> Stomach pain or nausea</label>
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="body"><i data-lucide="activity" style="width:16px;height:16px;color:var(--green)"></i> Body aches or joint pain</label>
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="dizziness"><i data-lucide="loader" style="width:16px;height:16px;color:#8b5cf6"></i> Dizziness or fainting</label>
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="rash"><i data-lucide="shield-alert" style="width:16px;height:16px;color:var(--accent)"></i> Skin rash or irritation</label>
+          </div>
+          <div class="form-group" style="margin-top:1.5rem">
+            <label>Duration of symptoms</label>
+            <select id="sym-duration">
+              <option>Less than 24 hours</option>
+              <option>1 – 3 days</option>
+              <option>3 – 7 days</option>
+              <option>More than a week</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>How severe do you feel? (1 = mild, 10 = very severe)</label>
+            <div class="scale-group" id="severity-scale">
+              <button class="scale-btn" onclick="selectSeverity(this,1)">1</button>
+              <button class="scale-btn" onclick="selectSeverity(this,2)">2</button>
+              <button class="scale-btn" onclick="selectSeverity(this,3)">3</button>
+              <button class="scale-btn" onclick="selectSeverity(this,4)">4</button>
+              <button class="scale-btn" onclick="selectSeverity(this,5)">5</button>
+              <button class="scale-btn" onclick="selectSeverity(this,6)">6</button>
+              <button class="scale-btn" onclick="selectSeverity(this,7)">7</button>
+              <button class="scale-btn" onclick="selectSeverity(this,8)">8</button>
+              <button class="scale-btn" onclick="selectSeverity(this,9)">9</button>
+              <button class="scale-btn" onclick="selectSeverity(this,10)">10</button>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="checkSymptoms()" style="margin-top:0.5rem">Analyse Symptoms <i data-lucide="arrow-right" class="icon-sm"></i></button>
+        </div>
+        <div>
+          <div id="symptom-result" class="hidden">
+            <!-- filled by JS -->
+          </div>
+          <div id="symptom-placeholder" style="text-align:center;padding:3rem 1rem">
+            <div style="display:flex;justify-content:center;margin-bottom:1rem;color:var(--text-light)"><i data-lucide="stethoscope" style="width:48px;height:48px"></i></div>
+            <p style="color:var(--text-muted);font-size:14px">Select your symptoms on the left and click<br><strong>Analyse Symptoms</strong> to get guidance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: MENTAL HEALTH ===================== -->
+<div id="page-mental" class="page">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn btn-outline btn-sm" onclick="showPage('dashboard')">← Back</button>
+      <div>
+        <h1>Mental Health Screening</h1>
+        <p>A short, confidential check-in about your mental well-being</p>
+      </div>
+    </div>
+  </div>
+  <div class="section" style="max-width:700px">
+    <div class="alert" style="margin-bottom:2rem">
+      <i data-lucide="message-circle" style="width:16px;height:16px;flex-shrink:0;margin-top:1px"></i>
+      <span style="font-size:13px">This screening is private and confidential. It takes about 2 minutes. Answer honestly — there are no wrong answers.</span>
+    </div>
+
+    <div id="mental-form">
+      <div id="mq1" class="card" style="margin-bottom:1.5rem">
+        <span class="tag">Mood</span>
+        <h3 style="margin-bottom:1rem">Over the last 2 weeks, how often have you felt down, hopeless, or had little interest in things you normally enjoy?</h3>
+        <div class="scale-group"><button class="scale-btn" onclick="selectMentalScale(this,'q1',0)">0<br><span style="font-size:9px">Never</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q1',1)">1<br><span style="font-size:9px">Rarely</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q1',2)">2<br><span style="font-size:9px">Sometimes</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q1',3)">3<br><span style="font-size:9px">Often</span></button></div>
+      </div>
+      <div id="mq2" class="card" style="margin-bottom:1.5rem">
+        <span class="tag">Stress</span>
+        <h3 style="margin-bottom:1rem">How stressed do you feel about your academic workload, exams, or personal life right now?</h3>
+        <div class="scale-group"><button class="scale-btn" onclick="selectMentalScale(this,'q2',0)">0<br><span style="font-size:9px">Not at all</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q2',1)">1<br><span style="font-size:9px">A little</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q2',2)">2<br><span style="font-size:9px">Quite a bit</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q2',3)">3<br><span style="font-size:9px">Extremely</span></button></div>
+      </div>
+      <div id="mq3" class="card" style="margin-bottom:1.5rem">
+        <span class="tag">Sleep</span>
+        <h3 style="margin-bottom:1rem">How would you describe your sleep quality over the past week?</h3>
+        <div class="scale-group"><button class="scale-btn" onclick="selectMentalScale(this,'q3',0)">0<br><span style="font-size:9px">Excellent</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q3',1)">1<br><span style="font-size:9px">Good</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q3',2)">2<br><span style="font-size:9px">Poor</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q3',3)">3<br><span style="font-size:9px">Very poor</span></button></div>
+      </div>
+      <div id="mq4" class="card" style="margin-bottom:1.5rem">
+        <span class="tag">Social</span>
+        <h3 style="margin-bottom:1rem">Have you been withdrawing from friends, family, or activities you used to enjoy?</h3>
+        <div class="scale-group"><button class="scale-btn" onclick="selectMentalScale(this,'q4',0)">0<br><span style="font-size:9px">Not at all</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q4',1)">1<br><span style="font-size:9px">Slightly</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q4',2)">2<br><span style="font-size:9px">Quite a bit</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q4',3)">3<br><span style="font-size:9px">A lot</span></button></div>
+      </div>
+      <div id="mq5" class="card" style="margin-bottom:1.5rem">
+        <span class="tag">Support</span>
+        <h3 style="margin-bottom:1rem">Do you feel you have people to talk to when you're going through a difficult time?</h3>
+        <div class="scale-group"><button class="scale-btn" onclick="selectMentalScale(this,'q5',3)">0<br><span style="font-size:9px">No one</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q5',2)">1<br><span style="font-size:9px">Rarely</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q5',1)">2<br><span style="font-size:9px">Sometimes</span></button><button class="scale-btn" onclick="selectMentalScale(this,'q5',0)">3<br><span style="font-size:9px">Always</span></button></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="submitMentalHealth()">See My Results <i data-lucide="arrow-right" class="icon-sm"></i></button>
+    </div>
+
+    <div id="mental-result" class="hidden">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: BOOK CONSULTATION ===================== -->
+<div id="page-book" class="page">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn btn-outline btn-sm" onclick="showPage('dashboard')">← Back</button>
+      <div>
+        <h1>Book a Consultation</h1>
+        <p>Schedule an appointment with a BUTH doctor</p>
+      </div>
+    </div>
+  </div>
+  <div class="section" style="max-width:800px">
+    <div id="book-form">
+      <!-- Step indicator -->
+      <div class="timeline" style="margin-bottom:2.5rem">
+        <div class="timeline-step active" id="bs1"><div class="step-circle">1</div><p class="step-label">Visit Type</p></div>
+        <div class="timeline-step" id="bs2"><div class="step-circle">2</div><p class="step-label">Pick Date</p></div>
+        <div class="timeline-step" id="bs3"><div class="step-circle">3</div><p class="step-label">Confirm</p></div>
+      </div>
+
+      <!-- Step 1 -->
+      <div id="book-step1">
+        <h3 style="margin-bottom:1rem">How would you like to consult?</h3>
+        <div class="radio-group">
+          <div class="radio-card" onclick="selectConsultType(this,'physical')">
+            <div class="icon"><i data-lucide="hospital" style="width:28px;height:28px;color:var(--green)"></i></div>
+            <div class="label">Physical Visit</div>
+            <div class="sublabel">In-person at BUTH Clinic</div>
+          </div>
+          <div class="radio-card" onclick="selectConsultType(this,'online')">
+            <div class="icon"><i data-lucide="monitor" style="width:28px;height:28px;color:#0891b2"></i></div>
+            <div class="label">Online Consultation</div>
+            <div class="sublabel">Video call with a doctor</div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:1.5rem">
+          <label>Reason for visit</label>
+          <select>
+            <option>General check-up</option>
+            <option>Malaria / fever</option>
+            <option>Respiratory issues</option>
+            <option>Digestive problems</option>
+            <option>Skin condition</option>
+            <option>Injury / pain</option>
+            <option>Mental health support</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Additional notes (optional)</label>
+          <textarea placeholder="Describe your symptoms or reason in a few words..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="bookStep(2)">Next: Choose Date <i data-lucide="arrow-right" class="icon-sm"></i></button>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="book-step2" class="hidden">
+        <h3 style="margin-bottom:1rem">Pick a date and time</h3>
+        <div class="grid-2">
+          <div>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:0.5rem">April 2025</p>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px">
+              <div style="font-size:10px;text-align:center;color:var(--text-muted);padding:4px">Su</div>
+              <div style="font-size:10px;text-align:center;color:var(--text-muted);padding:4px">Mo</div>
+              <div style="font-size:10px;text-align:center;color:var(--text-muted);padding:4px">Tu</div>
+              <div style="font-size:10px;text-align:center;color:var(--text-muted);padding:4px">We</div>
+              <div style="font-size:10px;text-align:center;color:var(--text-muted);padding:4px">Th</div>
+              <div style="font-size:10px;text-align:center;color:var(--text-muted);padding:4px">Fr</div>
+              <div style="font-size:10px;text-align:center;color:var(--text-muted);padding:4px">Sa</div>
+            </div>
+            <div class="cal-grid" id="book-cal"></div>
+          </div>
+          <div>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:0.5rem">Available time slots</p>
+            <div style="display:flex;flex-direction:column;gap:8px" id="time-slots">
+              <div class="radio-card" onclick="selectTime(this,'8:00 AM')" style="text-align:left;display:flex;align-items:center;gap:10px"><div class="icon" style="font-size:1rem;margin-bottom:0"><i data-lucide="clock" style="width:18px;height:18px;color:var(--text-muted)"></i></div><div><div class="label" style="font-size:13px">8:00 AM</div><div class="sublabel">Dr. Abiodun Adewale</div></div></div>
+              <div class="radio-card" onclick="selectTime(this,'10:30 AM')" style="text-align:left;display:flex;align-items:center;gap:10px"><div class="icon" style="font-size:1rem;margin-bottom:0"><i data-lucide="clock" style="width:18px;height:18px;color:var(--text-muted)"></i></div><div><div class="label" style="font-size:13px">10:30 AM</div><div class="sublabel">Dr. Chioma Osei</div></div></div>
+              <div class="radio-card" onclick="selectTime(this,'1:00 PM')" style="text-align:left;display:flex;align-items:center;gap:10px"><div class="icon" style="font-size:1rem;margin-bottom:0"><i data-lucide="clock" style="width:18px;height:18px;color:var(--text-muted)"></i></div><div><div class="label" style="font-size:13px">1:00 PM</div><div class="sublabel">Dr. Emmanuel Bello</div></div></div>
+              <div class="radio-card" onclick="selectTime(this,'3:30 PM')" style="text-align:left;display:flex;align-items:center;gap:10px"><div class="icon" style="font-size:1rem;margin-bottom:0"><i data-lucide="clock" style="width:18px;height:18px;color:var(--text-muted)"></i></div><div><div class="label" style="font-size:13px">3:30 PM</div><div class="sublabel">Dr. Abiodun Adewale</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:1.5rem">
+          <button class="btn btn-outline" onclick="bookStep(1)">← Back</button>
+          <button class="btn btn-primary" onclick="bookStep(3)">Next: Confirm <i data-lucide="arrow-right" class="icon-sm"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="book-step3" class="hidden">
+        <h3 style="margin-bottom:1.5rem">Confirm your appointment</h3>
+        <div class="card" style="margin-bottom:1.5rem">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div><p style="font-size:11px;color:var(--text-muted);margin-bottom:2px">Visit type</p><p style="font-weight:500" id="conf-type">Physical Visit</p></div>
+            <div><p style="font-size:11px;color:var(--text-muted);margin-bottom:2px">Date & Time</p><p style="font-weight:500" id="conf-datetime">April 14 · 10:30 AM</p></div>
+            <div><p style="font-size:11px;color:var(--text-muted);margin-bottom:2px">Doctor</p><p style="font-weight:500">Dr. Chioma Osei</p></div>
+            <div><p style="font-size:11px;color:var(--text-muted);margin-bottom:2px">Location</p><p style="font-weight:500">BUTH Clinic, Room 3</p></div>
+          </div>
+        </div>
+        <div class="alert" style="margin-bottom:1.5rem">
+          <i data-lucide="smartphone" style="width:16px;height:16px;flex-shrink:0;margin-top:1px"></i>
+          <span style="font-size:13px">A confirmation will be sent to your BU student email address.</span>
+        </div>
+        <div style="display:flex;gap:1rem">
+          <button class="btn btn-outline" onclick="bookStep(2)">← Back</button>
+          <button class="btn btn-primary" onclick="confirmBooking()">Confirm Appointment <i data-lucide="check" class="icon-sm"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <div id="book-success" class="hidden">
+      <div class="success-screen">
+        <div class="success-icon"><i data-lucide="check-circle" style="width:36px;height:36px;color:var(--green)"></i></div>
+        <h2>Appointment Booked!</h2>
+        <p style="color:var(--text-muted);max-width:360px">Your appointment has been confirmed. Check your BU email for the full details.</p>
+        <div class="card" style="margin:1rem 0;text-align:left;width:100%;max-width:360px">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="background:var(--green-light);border-radius:var(--radius-sm);padding:10px;text-align:center">
+              <p style="font-size:11px;color:var(--green);font-weight:600">APR</p>
+              <p style="font-size:1.4rem;font-weight:700;color:var(--green-dark)" id="conf-day">14</p>
+            </div>
+            <div>
+              <p style="font-weight:600;font-size:14px" id="conf-full">Physical Visit · 10:30 AM</p>
+              <p style="font-size:12px;color:var(--text-muted)">Dr. Chioma Osei · BUTH Clinic</p>
+              <span class="badge" style="margin-top:4px;font-size:10px">Confirmed</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-outline" onclick="showPage('dashboard')">Back to Dashboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: TESTS ===================== -->
+<div id="page-tests" class="page">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn btn-outline btn-sm" onclick="showPage('dashboard')">← Back</button>
+      <div>
+        <h1>Schedule Lab Tests</h1>
+        <p>Book diagnostic tests at Babcock University Teaching Hospital</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="grid-2" style="gap:2rem">
+      <div>
+        <h3 style="margin-bottom:1rem">Available Tests at BUTH</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:1.5rem">Select the tests you'd like to book</p>
+        <div style="display:flex;flex-direction:column;gap:10px" id="test-list">
+          <div class="test-item" onclick="toggleTest(this,'Malaria Rapid Test','₦1,500')">
+            <div><h3 style="font-size:14px">Malaria Rapid Test</h3><p style="font-size:12px;color:var(--text-muted)">Results in 20 minutes</p></div>
+            <div style="text-align:right"><p style="font-size:13px;font-weight:600;color:var(--green)">₦1,500</p><span class="badge" style="font-size:10px">Quick</span></div>
+          </div>
+          <div class="test-item" onclick="toggleTest(this,'Full Blood Count (FBC)','₦3,500')">
+            <div><h3 style="font-size:14px">Full Blood Count (FBC)</h3><p style="font-size:12px;color:var(--text-muted)">Comprehensive blood panel</p></div>
+            <div style="text-align:right"><p style="font-size:13px;font-weight:600;color:var(--green)">₦3,500</p><span class="badge" style="font-size:10px">Lab</span></div>
+          </div>
+          <div class="test-item" onclick="toggleTest(this,'Urinalysis','₦2,000')">
+            <div><h3 style="font-size:14px">Urinalysis</h3><p style="font-size:12px;color:var(--text-muted)">Kidney and bladder check</p></div>
+            <div style="text-align:right"><p style="font-size:13px;font-weight:600;color:var(--green)">₦2,000</p><span class="badge" style="font-size:10px">Lab</span></div>
+          </div>
+          <div class="test-item" onclick="toggleTest(this,'Typhoid Widal Test','₦2,500')">
+            <div><h3 style="font-size:14px">Typhoid Widal Test</h3><p style="font-size:12px;color:var(--text-muted)">Detects typhoid fever</p></div>
+            <div style="text-align:right"><p style="font-size:13px;font-weight:600;color:var(--green)">₦2,500</p><span class="badge" style="font-size:10px">Lab</span></div>
+          </div>
+          <div class="test-item" onclick="toggleTest(this,'Liver Function Test','₦4,500')">
+            <div><h3 style="font-size:14px">Liver Function Test (LFT)</h3><p style="font-size:12px;color:var(--text-muted)">Assess liver health</p></div>
+            <div style="text-align:right"><p style="font-size:13px;font-weight:600;color:var(--green)">₦4,500</p><span class="badge" style="font-size:10px">Lab</span></div>
+          </div>
+          <div class="test-item" onclick="toggleTest(this,'HIV Screening','₦1,000')">
+            <div><h3 style="font-size:14px">HIV Screening (Confidential)</h3><p style="font-size:12px;color:var(--text-muted)">Private and confidential</p></div>
+            <div style="text-align:right"><p style="font-size:13px;font-weight:600;color:var(--green)">₦1,000</p><span class="badge" style="font-size:10px">Screening</span></div>
+          </div>
+          <div class="test-item" onclick="toggleTest(this,'Blood Glucose Test','₦1,200')">
+            <div><h3 style="font-size:14px">Blood Glucose Test</h3><p style="font-size:12px;color:var(--text-muted)">Check for diabetes risk</p></div>
+            <div style="text-align:right"><p style="font-size:13px;font-weight:600;color:var(--green)">₦1,200</p><span class="badge" style="font-size:10px">Quick</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="position:sticky;top:80px">
+          <h3 style="margin-bottom:1rem">Selected Tests</h3>
+          <div id="test-summary" style="min-height:80px;display:flex;flex-direction:column;gap:8px">
+            <p style="color:var(--text-muted);font-size:13px" id="no-tests-msg">No tests selected yet. Click a test to add it.</p>
+          </div>
+          <hr class="divider">
+          <div style="display:flex;justify-content:space-between;margin-bottom:1rem">
+            <span style="font-weight:500">Total</span>
+            <span style="font-weight:700;color:var(--green)" id="test-total">₦0</span>
+          </div>
+          <div class="form-group">
+            <label>Preferred Date</label>
+            <input type="date" id="test-date">
+          </div>
+          <div class="form-group">
+            <label>Preferred Time</label>
+            <select>
+              <option>8:00 AM – 10:00 AM</option>
+              <option>10:00 AM – 12:00 PM</option>
+              <option>2:00 PM – 4:00 PM</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="confirmTests()">Book Tests at BUTH <i data-lucide="arrow-right" class="icon-sm"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: COACHING ===================== -->
+<div id="page-coaching" class="page">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn btn-outline btn-sm" onclick="showPage('dashboard')">← Back</button>
+      <div>
+        <h1>Lifestyle Coaching</h1>
+        <p>Practical health tips built for Babcock University student life</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:2rem">
+      <button class="btn btn-primary btn-sm" onclick="filterCoach('all',this)">All Tips</button>
+      <button class="btn btn-outline btn-sm" onclick="filterCoach('nutrition',this)"><i data-lucide="salad" class="icon-sm"></i> Nutrition</button>
+      <button class="btn btn-outline btn-sm" onclick="filterCoach('sleep',this)"><i data-lucide="moon" class="icon-sm"></i> Sleep</button>
+      <button class="btn btn-outline btn-sm" onclick="filterCoach('exercise',this)"><i data-lucide="dumbbell" class="icon-sm"></i> Exercise</button>
+      <button class="btn btn-outline btn-sm" onclick="filterCoach('habits',this)"><i data-lucide="star" class="icon-sm"></i> Habits</button>
+    </div>
+    <div class="grid-2" id="coaching-grid">
+      <div class="tip-card" data-cat="nutrition">
+        <div class="tip-icon" style="background:#dcfce7;color:#16a34a"><i data-lucide="salad" style="width:22px;height:22px"></i></div>
+        <div><h3 style="font-size:14px">Eat breakfast every morning</h3><p style="font-size:13px;color:var(--text-muted)">Students who eat breakfast have better concentration and energy through morning lectures. Try oats, eggs, or fruit.</p><span class="badge" style="margin-top:8px">Nutrition</span></div>
+      </div>
+      <div class="tip-card" data-cat="sleep">
+        <div class="tip-icon" style="background:#ede9fe;color:#7c3aed"><i data-lucide="moon" style="width:22px;height:22px"></i></div>
+        <div><h3 style="font-size:14px">Aim for 7–8 hours of sleep</h3><p style="font-size:13px;color:var(--text-muted)">Sleep deprivation affects memory, mood, and immune function. Set a consistent bedtime even during exam season.</p><span class="badge" style="margin-top:8px;background:#ede9fe;color:#6d28d9">Sleep</span></div>
+      </div>
+      <div class="tip-card" data-cat="exercise">
+        <div class="tip-icon" style="background:#fef3c7;color:#d97706"><i data-lucide="dumbbell" style="width:22px;height:22px"></i></div>
+        <div><h3 style="font-size:14px">30-minute walk daily</h3><p style="font-size:13px;color:var(--text-muted)">Even a short walk around campus improves mood, blood circulation, and reduces exam stress significantly.</p><span class="badge" style="margin-top:8px;background:#fef3c7;color:#92400e">Exercise</span></div>
+      </div>
+      <div class="tip-card" data-cat="habits">
+        <div class="tip-icon" style="background:#fee2e2;color:#dc2626"><i data-lucide="droplets" style="width:22px;height:22px"></i></div>
+        <div><h3 style="font-size:14px">Drink at least 2 litres of water daily</h3><p style="font-size:13px;color:var(--text-muted)">Dehydration causes headaches, poor focus, and fatigue. Carry a water bottle to every lecture.</p><span class="badge" style="margin-top:8px;background:#fee2e2;color:#991b1b">Habits</span></div>
+      </div>
+      <div class="tip-card" data-cat="nutrition">
+        <div class="tip-icon" style="background:#dcfce7;color:#16a34a"><i data-lucide="utensils" style="width:22px;height:22px"></i></div>
+        <div><h3 style="font-size:14px">Reduce late-night heavy meals</h3><p style="font-size:13px;color:var(--text-muted)">Eating heavy foods late at night disrupts sleep quality. Opt for lighter snacks like fruit or yoghurt after 8 PM.</p><span class="badge" style="margin-top:8px">Nutrition</span></div>
+      </div>
+      <div class="tip-card" data-cat="habits">
+        <div class="tip-icon" style="background:#fef3c7;color:#d97706"><i data-lucide="phone-off" style="width:22px;height:22px"></i></div>
+        <div><h3 style="font-size:14px">Phone-free 30 mins before bed</h3><p style="font-size:13px;color:var(--text-muted)">Blue light from screens suppresses melatonin. Swap your phone for a book or journal before sleep.</p><span class="badge" style="margin-top:8px;background:#fef3c7;color:#92400e">Habits</span></div>
+      </div>
+      <div class="tip-card" data-cat="exercise">
+        <div class="tip-icon" style="background:#fef3c7;color:#d97706"><i data-lucide="move" style="width:22px;height:22px"></i></div>
+        <div><h3 style="font-size:14px">Try 5-minute desk stretches</h3><p style="font-size:13px;color:var(--text-muted)">Sitting for long periods strains the back and neck. Simple stretches every 90 minutes reduce pain and improve posture.</p><span class="badge" style="margin-top:8px;background:#fef3c7;color:#92400e">Exercise</span></div>
+      </div>
+      <div class="tip-card" data-cat="sleep">
+        <div class="tip-icon" style="background:#ede9fe;color:#7c3aed"><i data-lucide="bed" style="width:22px;height:22px"></i></div>
+        <div><h3 style="font-size:14px">Avoid all-nighters during exams</h3><p style="font-size:13px;color:var(--text-muted)">Pulling all-nighters reduces memory retention by up to 40%. Study early, sleep properly, and review in the morning.</p><span class="badge" style="margin-top:8px;background:#ede9fe;color:#6d28d9">Sleep</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: CHECK-IN ===================== -->
+<div id="page-checkin" class="page">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn btn-outline btn-sm" onclick="showPage('dashboard')">← Back</button>
+      <div>
+        <h1>Monthly Wellness Check-in</h1>
+        <p>April 2025 — Track your health month by month</p>
+      </div>
+    </div>
+  </div>
+  <div class="section" style="max-width:700px">
+    <div id="checkin-form">
+      <div class="alert" style="margin-bottom:2rem">
+        <i data-lucide="bar-chart-2" style="width:16px;height:16px;flex-shrink:0;margin-top:1px"></i>
+        <span style="font-size:13px">This month's check-in helps us track your health over time. Quick and easy — 5 questions!</span>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem">
+        <span class="tag">Overall Health</span>
+        <h3 style="margin-bottom:1rem">How would you rate your overall physical health this month?</h3>
+        <div class="radio-group">
+          <div class="radio-card" onclick="selectCheckin(this,'health','Excellent')"><div class="icon"><i data-lucide="trending-up" style="width:24px;height:24px;color:var(--green)"></i></div><div class="label">Excellent</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'health','Good')"><div class="icon"><i data-lucide="smile" style="width:24px;height:24px;color:#10b981"></i></div><div class="label">Good</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'health','Fair')"><div class="icon"><i data-lucide="minus" style="width:24px;height:24px;color:#f59e0b"></i></div><div class="label">Fair</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'health','Poor')"><div class="icon"><i data-lucide="frown" style="width:24px;height:24px;color:var(--accent)"></i></div><div class="label">Poor</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem">
+        <span class="tag">Sick Days</span>
+        <h3 style="margin-bottom:1rem">How many days this month were you too unwell to attend class or study?</h3>
+        <div class="radio-group">
+          <div class="radio-card" onclick="selectCheckin(this,'sick','0 days')"><div class="label">None</div><div class="sublabel">0 days</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'sick','1–2 days')"><div class="label">1–2 days</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'sick','3–5 days')"><div class="label">3–5 days</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'sick','6+ days')"><div class="label">6+ days</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem">
+        <span class="tag">Exercise</span>
+        <h3 style="margin-bottom:1rem">How often did you engage in physical activity this month?</h3>
+        <div class="radio-group">
+          <div class="radio-card" onclick="selectCheckin(this,'exercise','Daily')"><div class="label">Daily</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'exercise','3–5x/week')"><div class="label">3–5x / week</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'exercise','1–2x/week')"><div class="label">1–2x / week</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'exercise','Rarely')"><div class="label">Rarely</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem">
+        <span class="tag">Diet</span>
+        <h3 style="margin-bottom:1rem">How satisfied are you with your eating habits this month?</h3>
+        <div class="radio-group">
+          <div class="radio-card" onclick="selectCheckin(this,'diet','Very satisfied')"><div class="icon"><i data-lucide="smile" style="width:24px;height:24px;color:var(--green)"></i></div><div class="label">Very satisfied</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'diet','Okay')"><div class="icon"><i data-lucide="meh" style="width:24px;height:24px;color:#10b981"></i></div><div class="label">Okay</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'diet','Could be better')"><div class="icon"><i data-lucide="meh" style="width:24px;height:24px;color:#f59e0b"></i></div><div class="label">Could improve</div></div>
+          <div class="radio-card" onclick="selectCheckin(this,'diet','Very poor')"><div class="icon"><i data-lucide="frown" style="width:24px;height:24px;color:var(--accent)"></i></div><div class="label">Very poor</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem">
+        <span class="tag">Goals</span>
+        <h3 style="margin-bottom:1rem">Is there a specific health goal you'd like to focus on next month?</h3>
+        <div class="form-group" style="margin-bottom:0">
+          <textarea id="health-goal" placeholder="e.g. Sleep earlier, drink more water, exercise 3 times a week..."></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="submitCheckin()">Submit April Check-in <i data-lucide="arrow-right" class="icon-sm"></i></button>
+    </div>
+
+    <div id="checkin-result" class="hidden">
+      <div class="success-screen">
+        <div class="success-icon"><i data-lucide="bar-chart-2" style="width:36px;height:36px;color:var(--green)"></i></div>
+        <h2>Check-in Complete!</h2>
+        <p style="color:var(--text-muted);max-width:360px">Your April 2025 wellness check-in has been recorded. Here's your summary:</p>
+        <div style="width:100%;max-width:400px;margin:1rem 0">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--green-light);border-radius:var(--radius-sm)">
+              <span style="font-size:13px;color:var(--green-dark)">Overall Health</span>
+              <span style="font-weight:600;color:var(--green-dark)" id="cr-health">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--green-light);border-radius:var(--radius-sm)">
+              <span style="font-size:13px;color:var(--green-dark)">Sick Days</span>
+              <span style="font-weight:600;color:var(--green-dark)" id="cr-sick">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--green-light);border-radius:var(--radius-sm)">
+              <span style="font-size:13px;color:var(--green-dark)">Exercise Frequency</span>
+              <span style="font-weight:600;color:var(--green-dark)" id="cr-exercise">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--green-light);border-radius:var(--radius-sm)">
+              <span style="font-size:13px;color:var(--green-dark)">Diet Satisfaction</span>
+              <span style="font-weight:600;color:var(--green-dark)" id="cr-diet">—</span>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted)">Next check-in: May 1, 2025</p>
+        <button class="btn btn-outline" onclick="showPage('dashboard')">Back to Dashboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: ABOUT ===================== -->
+<div id="page-about" class="page">
+  <div class="about-hero">
+    <h1>About Clinify.BU</h1>
+    <p>Bridging the gap between Babcock University students and quality healthcare at BUTH</p>
+  </div>
+
+  <div class="section" style="max-width:900px">
+    <div class="grid-2" style="gap:3rem;align-items:center;margin-bottom:4rem">
+      <div>
+        <span class="tag">Our Mission</span>
+        <h2>Making healthcare simple for every BU student</h2>
+        <p style="color:var(--text-muted);margin-top:0.5rem">Clinify.BU was built to remove the barriers between Babcock University students and the excellent healthcare available at the Babcock University Teaching Hospital (BUTH). No more long queues, missed consultations, or confusing processes.</p>
+      </div>
+      <div class="card" style="background:var(--green-light);border-color:#9FE1CB">
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <i data-lucide="hospital" style="width:20px;height:20px;color:var(--green-dark);flex-shrink:0;margin-top:2px"></i>
+            <div><h3 style="font-size:14px">Babcock University Teaching Hospital (BUTH)</h3><p style="font-size:12px;color:var(--green-darker)">A world-class teaching hospital on the BU campus serving students, staff, and the surrounding community.</p></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <i data-lucide="map-pin" style="width:20px;height:20px;color:var(--green-dark);flex-shrink:0;margin-top:2px"></i>
+            <div><h3 style="font-size:14px">Location</h3><p style="font-size:12px;color:var(--green-darker)">Ile-Ife Road, Ilishan-Remo, Ogun State, Nigeria</p></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <i data-lucide="clock" style="width:20px;height:20px;color:var(--green-dark);flex-shrink:0;margin-top:2px"></i>
+            <div><h3 style="font-size:14px">Clinic Hours</h3><p style="font-size:12px;color:var(--green-darker)">Monday – Saturday: 8:00 AM – 5:00 PM<br>Emergency: 24 hours</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:3rem">
+      <span class="tag">How It Works</span>
+      <h2 style="margin-bottom:2rem">Three simple steps to better health</h2>
+      <div class="grid-3">
+        <div class="card" style="text-align:center">
+          <div class="step-num">1</div>
+          <h3>Log in with BU credentials</h3>
+          <p style="font-size:13px;color:var(--text-muted)">Use your existing Babcock University student portal login — no new account needed.</p>
+        </div>
+        <div class="card" style="text-align:center">
+          <div class="step-num">2</div>
+          <h3>Use our health tools</h3>
+          <p style="font-size:13px;color:var(--text-muted)">Check symptoms, screen your mental health, book appointments, and get wellness tips.</p>
+        </div>
+        <div class="card" style="text-align:center">
+          <div class="step-num">3</div>
+          <h3>Get care at BUTH</h3>
+          <p style="font-size:13px;color:var(--text-muted)">Your bookings connect directly to BUTH. Visit in-person or consult online with their doctors.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div style="margin-bottom:3rem">
+      <span class="tag">Contact Us</span>
+      <h2 style="margin-bottom:1.5rem">Get in touch</h2>
+      <div class="grid-2" style="gap:2rem">
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div class="card" style="display:flex;gap:12px;align-items:center">
+            <i data-lucide="phone" style="width:24px;height:24px;color:var(--green);flex-shrink:0"></i>
+            <div><p style="font-size:11px;color:var(--text-muted)">BUTH Main Line</p><p style="font-weight:600">+234 803 XXX XXXX</p></div>
+          </div>
+          <div class="card" style="display:flex;gap:12px;align-items:center">
+            <i data-lucide="mail" style="width:24px;height:24px;color:var(--green);flex-shrink:0"></i>
+            <div><p style="font-size:11px;color:var(--text-muted)">Email</p><p style="font-weight:600">health@babcock.edu.ng</p></div>
+          </div>
+          <div class="card" style="display:flex;gap:12px;align-items:center">
+            <i data-lucide="alert-triangle" style="width:24px;height:24px;color:var(--accent);flex-shrink:0"></i>
+            <div><p style="font-size:11px;color:var(--text-muted)">Emergency Line</p><p style="font-weight:600">Available 24/7 on campus</p></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h3 style="margin-bottom:1rem">Send a message</h3>
+            <div class="form-group"><label>Your Name</label><input type="text" placeholder="Full name"></div>
+            <div class="form-group"><label>Email</label><input type="email" placeholder="u2021xxxxx@babcock.edu.ng"></div>
+            <div class="form-group"><label>Message</label><textarea placeholder="How can we help you?"></textarea></div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center">Send Message</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--green-deeper);border:none;text-align:center;padding:2.5rem">
+      <h2 style="color:white;margin-bottom:0.5rem">Ready to take charge of your health?</h2>
+      <p style="color:rgba(255,255,255,0.7);margin-bottom:1.5rem">Join Clinify.BU and connect with BUTH today.</p>
+      <button class="btn btn-white" onclick="showPage('login')">Get Started <i data-lucide="arrow-right" class="icon-sm"></i></button>
+    </div>
+  </div>
+
+  <!-- Footer repeated -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <h3>Clinify.BU</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.6);max-width:280px">Connecting Babcock University students to quality care at BUTH.</p>
+      </div>
+      <div>
+        <h3>Services</h3>
+        <a onclick="showPage('dashboard')">Symptom Checker</a>
+        <a onclick="showPage('dashboard')">Mental Health</a>
+        <a onclick="showPage('dashboard')">Book Appointment</a>
+      </div>
+      <div>
+        <h3>Info</h3>
+        <a onclick="showPage('about')">About Clinify.BU</a>
+        <a onclick="showPage('about')">Contact BUTH</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Clinify.BU · Babcock University Teaching Hospital</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // ---- PAGE ROUTING ----
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    window.scrollTo(0, 0);
+    // Re-run lucide after page switch since new icons may be in DOM
+    lucide.createIcons();
+  }
+
+  // ---- LOGIN ----
+  function doLogin() {
+    const email = document.getElementById('login-email').value;
+    const pass = document.getElementById('login-pass').value;
+    if (!email || !pass) { alert('Please enter your BU email and password.'); return; }
+    showPage('dashboard');
+  }
+
+  // ---- SYMPTOM CHECKER ----
+  let selectedSeverity = 0;
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+  }
+  function selectSeverity(btn, val) {
+    document.querySelectorAll('#severity-scale .scale-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedSeverity = val;
+  }
+  function checkSymptoms() {
+    const checked = document.querySelectorAll('#symptom-list input:checked');
+    if (checked.length === 0) { alert('Please select at least one symptom.'); return; }
+    const dur = document.getElementById('sym-duration').value;
+    const count = checked.length;
+    const sev = selectedSeverity || 3;
+
+    let level, color, iconName, iconColor, advice, action;
+    if (sev >= 8 || (count >= 4 && sev >= 6)) {
+      level = 'Seek Urgent Care'; color = 'danger'; iconName = 'siren'; iconColor = 'var(--accent)';
+      advice = 'Your symptoms are severe and may require immediate attention. Please visit BUTH Emergency Care right away. Do not delay.';
+      action = 'Visit BUTH Emergency';
+    } else if (sev >= 5 || count >= 3) {
+      level = 'Book a Consultation'; color = 'warning'; iconName = 'triangle-alert'; iconColor = '#f59e0b';
+      advice = 'Your symptoms suggest you should see a doctor soon. We recommend booking a consultation with a BUTH doctor within 24–48 hours.';
+      action = 'Book Consultation';
+    } else {
+      level = 'Rest & Monitor'; color = ''; iconName = 'pill'; iconColor = 'var(--green)';
+      advice = 'Your symptoms appear mild. Get enough rest, stay hydrated, and monitor your condition. If symptoms worsen or persist beyond 3 days, see a doctor.';
+      action = 'View Lifestyle Tips';
+    }
+
+    const symptoms = Array.from(checked).map(c => c.closest('.checkbox-item').textContent.trim()).join(', ');
+    document.getElementById('symptom-placeholder').classList.add('hidden');
+    const res = document.getElementById('symptom-result');
+    res.classList.remove('hidden');
+    res.innerHTML = `
+      <div class="result-box ${color}" style="margin-bottom:1rem">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.5rem">
+          <i data-lucide="${iconName}" style="width:20px;height:20px;color:${iconColor};flex-shrink:0"></i>
+          <strong style="font-size:15px">${level}</strong>
+        </div>
+        <p style="font-size:13px;margin-top:4px">${advice}</p>
+      </div>
+      <div class="card" style="margin-bottom:1rem">
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Symptoms reported</p>
+        <p style="font-size:13px">${symptoms}</p>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:8px">Duration: ${dur} · Severity: ${sev}/10</p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="showPage('book')">${action} <i data-lucide="arrow-right" style="width:14px;height:14px"></i></button>
+    `;
+    lucide.createIcons();
+  }
+
+
+  const mentalScores = {};
+  function selectMentalScale(btn, q, val) {
+    btn.closest('.scale-group').querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    mentalScores[q] = val;
+  }
+  function submitMentalHealth() {
+    if (Object.keys(mentalScores).length < 5) { alert('Please answer all 5 questions.'); return; }
+    const total = Object.values(mentalScores).reduce((a,b) => a+b, 0);
+    document.getElementById('mental-form').classList.add('hidden');
+    const res = document.getElementById('mental-result');
+    res.classList.remove('hidden');
+
+    let level, color, desc, recs;
+    if (total <= 3) {
+      level = 'Thriving'; color = 'var(--green)';
+      desc = 'Your mental well-being looks great! Keep up the healthy habits and stay connected with those around you.';
+      recs = ['Keep your current sleep and study routine', 'Stay socially connected', 'Continue exercising regularly'];
+    } else if (total <= 7) {
+      level = 'Doing Okay'; color = '#f59e0b';
+      desc = 'You\'re managing, but there are some areas to keep an eye on. Small lifestyle improvements can make a big difference.';
+      recs = ['Try to improve your sleep schedule', 'Take study breaks every 90 minutes', 'Talk to a friend about how you\'re feeling', 'Consider our lifestyle coaching tips'];
+    } else {
+      level = 'Needs Attention'; color = 'var(--accent)';
+      desc = 'Your responses suggest you may be experiencing significant stress or emotional difficulty. You\'re not alone — BUTH counselors are here to help.';
+      recs = ['Book a counseling session at BUTH', 'Talk to a trusted friend or family member', 'Avoid isolation — stay socially active', 'Reach out to the BU chaplaincy or wellness office'];
+    }
+
+    res.innerHTML = `
+      <div style="text-align:center;padding:1.5rem 0">
+        <div style="display:flex;justify-content:center;margin-bottom:0.5rem;color:${color}"><i data-lucide="brain" style="width:48px;height:48px"></i></div>
+        <h2 style="color:${color}">${level}</h2>
+        <p style="color:var(--text-muted);font-size:14px;max-width:400px;margin:0.5rem auto">${desc}</p>
+      </div>
+      <div style="margin:0 0 1.5rem">
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Wellness score</p>
+        <div class="meter-bar" style="height:12px"><div class="meter-fill" style="width:${100 - (total/15*100)}%;background:${color}"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:4px"><span>Needs support</span><span>Thriving</span></div>
+      </div>
+      <div class="card" style="margin-bottom:1.5rem">
+        <h3 style="margin-bottom:0.8rem;font-size:14px">Recommendations</h3>
+        ${recs.map(r => `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px"><i data-lucide="check" style="width:14px;height:14px;color:var(--green);flex-shrink:0;margin-top:2px"></i><p style="font-size:13px;color:var(--text-muted)">${r}</p></div>`).join('')}
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPage('book')">Book a Counselling Session <i data-lucide="arrow-right" style="width:14px;height:14px"></i></button>
+        <button class="btn btn-outline" onclick="location.reload()">Retake Screening</button>
+      </div>
+    `;
+    lucide.createIcons();
+  }
+
+  // ---- BOOK CONSULTATION ----
+  let consultType = 'physical';
+  let selectedDate = '';
+  let selectedTime = '10:30 AM';
+  let selectedDay = '14';
+
+  function selectConsultType(el, type) {
+    document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    consultType = type;
+  }
+  function selectTime(el, time) {
+    document.querySelectorAll('#time-slots .radio-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedTime = time;
+  }
+  function bookStep(n) {
+    ['book-step1','book-step2','book-step3'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    document.getElementById('book-step' + n).classList.remove('hidden');
+    ['bs1','bs2','bs3'].forEach((id,i) => {
+      const el = document.getElementById(id);
+      el.classList.remove('done','active');
+      if (i+1 < n) el.classList.add('done');
+      if (i+1 === n) el.classList.add('active');
+    });
+    if (n === 3) {
+      document.getElementById('conf-type').textContent = consultType === 'physical' ? 'Physical Visit at BUTH' : 'Online Video Consultation';
+      document.getElementById('conf-datetime').textContent = `April ${selectedDay} · ${selectedTime}`;
+    }
+    lucide.createIcons();
+  }
+  function confirmBooking() {
+    document.getElementById('book-form').classList.add('hidden');
+    document.getElementById('book-success').classList.remove('hidden');
+    document.getElementById('conf-day').textContent = selectedDay;
+    document.getElementById('conf-full').textContent = (consultType === 'physical' ? 'Physical Visit' : 'Online Consult') + ' · ' + selectedTime;
+    lucide.createIcons();
+  }
+
+  // Build calendar
+  function buildCalendar() {
+    const cal = document.getElementById('book-cal');
+    if (!cal) return;
+    cal.innerHTML = '';
+    const disabled = [1,2,3,7,8,13,14,20,21,27,28];
+    for (let d = 1; d <= 30; d++) {
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell' + (disabled.includes(d) ? ' disabled' : '') + (d === 6 ? ' today' : '');
+      cell.textContent = d;
+      if (!disabled.includes(d)) {
+        cell.onclick = () => {
+          document.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
+          cell.classList.add('selected');
+          selectedDay = d;
+        };
+      }
+      cal.appendChild(cell);
+    }
+  }
+
+
+  const selectedTests = {};
+  function toggleTest(el, name, price) {
+    el.classList.toggle('selected');
+    const num = parseInt(price.replace(/[₦,]/g,''));
+    if (el.classList.contains('selected')) {
+      selectedTests[name] = num;
+    } else {
+      delete selectedTests[name];
+    }
+    updateTestSummary();
+  }
+  function updateTestSummary() {
+    const summary = document.getElementById('test-summary');
+    const noMsg = document.getElementById('no-tests-msg');
+    const total = Object.values(selectedTests).reduce((a,b)=>a+b,0);
+    document.getElementById('test-total').textContent = '₦' + total.toLocaleString();
+    const names = Object.keys(selectedTests);
+    if (names.length === 0) {
+      noMsg.classList.remove('hidden');
+      const existing = summary.querySelectorAll('.test-tag');
+      existing.forEach(e => e.remove());
+    } else {
+      noMsg.classList.add('hidden');
+      summary.querySelectorAll('.test-tag').forEach(e => e.remove());
+      names.forEach(n => {
+        const div = document.createElement('div');
+        div.className = 'test-tag';
+        div.style.cssText = 'display:flex;justify-content:space-between;padding:8px 12px;background:var(--green-light);border-radius:6px;font-size:13px';
+        div.innerHTML = `<span>${n}</span><span style="color:var(--green-dark);font-weight:500">₦${selectedTests[n].toLocaleString()}</span>`;
+        summary.appendChild(div);
+      });
+    }
+  }
+  function confirmTests() {
+    if (Object.keys(selectedTests).length === 0) { alert('Please select at least one test.'); return; }
+    alert('Your lab tests have been scheduled at BUTH! You\'ll receive a confirmation email at your BU student address.');
+    showPage('dashboard');
+  }
+
+  // ---- COACHING ----
+  function filterCoach(cat, btn) {
+    const cards = document.querySelectorAll('#coaching-grid .tip-card');
+    cards.forEach(c => {
+      c.style.display = (cat === 'all' || c.dataset.cat === cat) ? 'flex' : 'none';
+    });
+  }
+
+  // ---- CHECKIN ----
+  const checkinData = {};
+  function selectCheckin(el, key, val) {
+    const siblings = el.parentElement.querySelectorAll('.radio-card');
+    siblings.forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    checkinData[key] = val;
+  }
+  function submitCheckin() {
+    if (Object.keys(checkinData).length < 4) { alert('Please answer all questions before submitting.'); return; }
+    document.getElementById('checkin-form').classList.add('hidden');
+    const res = document.getElementById('checkin-result');
+    res.classList.remove('hidden');
+    document.getElementById('cr-health').textContent = checkinData['health'] || '—';
+    document.getElementById('cr-sick').textContent = checkinData['sick'] || '—';
+    document.getElementById('cr-exercise').textContent = checkinData['exercise'] || '—';
+    document.getElementById('cr-diet').textContent = checkinData['diet'] || '—';
+    lucide.createIcons();
+  }
+
+  // INIT
+window.addEventListener('load', () => {
+  buildCalendar();
+  lucide.createIcons();
+});
+</script>
+</body>
+</html>
